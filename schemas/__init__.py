@@ -8,15 +8,15 @@ class Query(graphene.ObjectType):
     movies = graphene.List(Movie)
     genres = graphene.List(Genre)
     getMoviesByGenre = graphene.List(Movie, genreId=graphene.Int(required=True))
-    getGenreByMovie = graphene.Field(Genre, movieId=graphene.Int(required=True))
+    getGenreByMovie = graphene.Field(Genre, movieName=graphene.String(required=True))
 
     def resolve_getMoviesByGenre(self, info, genreId):
         return db.session.execute(db.select(MovieModel).where(MovieModel.genre_id == genreId)).scalars()
     
-    def resolve_getGenreByMovie(self, info, movieId):
-        movie = db.session.execute(db.select(MovieModel).where(MovieModel.id == movieId)).first()
+    def resolve_getGenreByMovie(self, info, movieName):
+        movie = db.session.execute(db.select(MovieModel).where(MovieModel.title == movieName)).scalars().first()
         print(movie)
-        return db.session.execute(db.select(GenreModel).where(GenreModel.id == movie.genre_id)).first()
+        return db.session.execute(db.select(GenreModel).where(GenreModel.id == movie.genre_id)).scalars().first()
     
     def resolve_movies(self, info):
         return db.session.execute(db.select(MovieModel)).scalars()
